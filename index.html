@@ -56,7 +56,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
-            align-items: flex-start; /* Cambiado de center a flex-start para evitar recorte superior */
+            align-items: flex-start;
             justify-content: center;
             padding: 20px;
             animation: gradientShift 12s ease infinite;
@@ -79,8 +79,8 @@
             animation: fadeIn 2s ease-in;
             position: relative;
             overflow: auto;
-            min-height: 80vh; /* Aumentado para mayor espacio */
-            width: 100%; /* Asegurar que ocupe el ancho disponible */
+            min-height: 80vh;
+            width: 100%;
         }
 
         .container::before {
@@ -110,7 +110,7 @@
             text-align: center;
             margin-bottom: 40px;
             position: relative;
-            padding-top: 20px; /* Espacio adicional para el título */
+            padding-top: 20px;
         }
 
         .header::after {
@@ -169,7 +169,7 @@
             text-align: center;
             margin: 20px 0;
             position: sticky;
-            top: 10px; /* Fija los botones cerca del inicio */
+            top: 10px;
             background: rgba(255, 255, 255, 0.9);
             padding: 10px;
             z-index: 1;
@@ -528,7 +528,7 @@
             }
 
             .navigation {
-                top: 5px; /* Ajuste para pantallas pequeñas */
+                top: 5px;
             }
         }
     </style>
@@ -603,7 +603,7 @@
                 </div>
                 
                 <div class="message-paragraph">
-                    Te comenté que primero prefiero conocer a alguien porque ya han roto la confianza y cuando te dije para estar era porque estaba seguro que eras la persona ideal y así lo creí, pero tal vez hice mal no demostrarte de todas las formas que me importas y que te quiero como no tienes idea, y cuando me pediste tiempo ya veía venir lo que ha pasado, nadie pide tiempo de la nada las cuales así como "dices que te dolió verme con María Laura", las cuales solo era cosa de trabajo y tú sabes bien que no te lastimaría y tampoco estaría con alguien más de clínica que no seas tú, y si soy enojón y orgulloso por eso aproveché todos los viajes posibles hacer para olvidarme de ti y de orgullo ni te escribía pero tu tampoco lo hiciste porque sé eres orgullosa, pero así dos personas que se aman se alejan, o no sé si algún momento de verdad me amaste, algún día dirás este terco que me decía anda al doctor, al gym, a pasear para irnos a la sierra , cuando te decia que comas quion para tu gripe...  ya no me molesta, bueno supongo que ya habrá alguien como me lo dijiste, este terco molesto ya no estará cerca.
+                    Te comenté que primero prefiero conocer a alguien porque ya han roto la confianza y cuando te dije para estar era porque estaba seguro que eras la persona ideal y así lo creí, pero tal vez hice mal no demostrarte de todas las formas que me importas y que te quiero como no tienes idea, y cuando me pediste tiempo ya veía venir lo que ha pasado, nadie pide tiempo de la nada las cuales así como "dices que te dolió verme con María Laura", las cuales solo era cosa de trabajo y tú sabes bien que no te lastimaría y tampoco estaría con alguien más de clínica que no seas tú, y si soy enojón y orgulloso por eso aproveché todos los viajes posibles hacer para olvidarme de ti y de orgullo ni te escribía pero tu tampoco lo hiciste porque sé eres orgullosa, pero así dos personas que se aman se alejan, o no sé si algún momento de verdad me amaste, algún día dirás este terco que me decía anda al doctor, al gym, a pasear ya no me molesta, bueno supongo que ya habrá alguien como me lo dijiste, este terco molesto ya no estará cerca.
                 </div>
             </div>
 
@@ -619,7 +619,7 @@
         </div>
 
         <div class="music-section">
-            <p class="music-intro">🎵 Esta canción siempre me hará recordar a ti  🎵</p>
+            <p class="music-intro">🎵 Esta canción siempre me hará recordar lo que vivimos juntos 🎵</p>
             <div class="video-links">
                 <p style="color: #2c3e50; margin-bottom: 20px; font-weight: bold;">Puedes ver el video en:</p>
                 <a href="https://www.youtube.com/watch?v=7XPmRUp_Yf4" target="_blank" class="video-link">
@@ -631,17 +631,16 @@
             </div>
         </div>
 
-       
+        <div class="counter" id="accessCounter">
+            Veces accedido: <span id="accessCount">0</span>
+        </div>
 
         <div class="signature">
             <p>Siempre en mi corazón</p>
         </div>
 
         <div class="footer">
-            <p>Con amor eterno </p>
-            <br>
-            <p2>Si deseas responderme </p2>
-
+            <p>Con amor eterno</p>
             <button class="access-button" onclick="openWhatsApp()">Responder por WhatsApp</button>
         </div>
 
@@ -649,13 +648,8 @@
             <p><strong>P.D.: Jor. Fi..</strong></p>
         </div>
 
-
-        <div class="counter" id="accessCounter">
-            Veces accedido: 6
-        </div>
-
         <div class="notification" id="notification">
-            💌 Mensaje leído el 13/6/2025, 10:49 a. m. después de 0 intentos fallidos.
+            💌 Mensaje leído el 13/6/2025, 11:11 a. m. después de 0 intentos fallidos.
         </div>
     </div>
 
@@ -664,6 +658,14 @@
         const ACCESS_CODE = "CACHETONA";
         let startTime = null;
         let attemptCount = parseInt(localStorage.getItem('attemptCount') || '0'); // Contador de intentos fallidos
+
+        // Función para actualizar el contador de accesos
+        function updateAccessCounter() {
+            let accessCount = parseInt(localStorage.getItem('accessCount') || '0');
+            accessCount += 1;
+            localStorage.setItem('accessCount', accessCount);
+            document.getElementById('accessCount').textContent = accessCount;
+        }
 
         // Función para verificar el código de acceso
         function checkAccess() {
@@ -728,6 +730,7 @@
                 mainMessage.style.display = 'block';
                 mainMessage.classList.add('fade-in');
                 window.scrollTo(0, 0); // Asegura que se vea desde el inicio
+                updateAccessCounter(); // Incrementa y actualiza el contador
                 notification.style.display = 'block';
                 console.log(`Mensaje leído el ${new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' })} después de ${attemptCount} intentos fallidos.`);
             }, 1200);
@@ -762,6 +765,8 @@
                 attemptsCounter.textContent = `Intentos fallidos: ${attemptCount}`; // Mostrar intentos iniciales
                 accessInput.focus();
             }
+            // Inicializar el contador al cargar la página
+            updateAccessCounter();
         });
 
         // Prevenir el clic derecho (opcional)
