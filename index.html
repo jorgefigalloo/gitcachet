@@ -1,0 +1,793 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Un Mensaje del Corazón</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: gradientShift 12s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+            33% { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+            66% { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        }
+
+        .container {
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 50px 40px;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: fadeIn 2s ease-in;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #667eea);
+            background-size: 300% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            width: 120px;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            display: block;
+            margin: 20px auto;
+            border-radius: 3px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); }
+            to { text-shadow: 2px 2px 20px rgba(102, 126, 234, 0.5); }
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.3em;
+            font-style: italic;
+        }
+
+        .message {
+            color: #2c3e50;
+            line-height: 1.9;
+            font-size: 1.15em;
+            text-align: justify;
+            text-indent: 35px;
+            margin: 35px 0;
+            position: relative;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            border-left: 6px solid #667eea;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .message::before {
+            content: '"';
+            font-size: 5em;
+            color: #667eea;
+            opacity: 0.2;
+            position: absolute;
+            top: -15px;
+            left: 15px;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .message-paragraph {
+            margin-bottom: 25px;
+            padding: 15px 0;
+        }
+
+        .message-paragraph:not(:last-child) {
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .signature {
+            text-align: center;
+            margin-top: 50px;
+            color: #7f8c8d;
+            font-style: italic;
+            font-size: 1.2em;
+        }
+
+        .hearts {
+            text-align: center;
+            font-size: 2.5em;
+            margin: 30px 0;
+            animation: heartbeat 2s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #95a5a6;
+            font-size: 1em;
+        }
+
+        .container:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            transition: all 0.4s ease;
+        }
+
+        /* Pantalla de clave de acceso */
+        .access-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: gradientShift 12s ease infinite;
+        }
+
+        .access-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 80px 50px;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            animation: pulseWelcome 2.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseWelcome {
+            from { transform: scale(1); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3); }
+            to { transform: scale(1.03); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4); }
+        }
+
+        .access-container h1 {
+            font-size: 4em;
+            margin-bottom: 25px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-8px); }
+        }
+
+        .access-container h2 {
+            color: #2c3e50;
+            font-size: 2.3em;
+            margin-bottom: 20px;
+            font-family: 'Georgia', serif;
+        }
+
+        .access-container p {
+            color: #7f8c8d;
+            font-size: 1.3em;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+
+        .access-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 15px 20px;
+            font-size: 1.2em;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+            font-family: 'Georgia', serif;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .access-input:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+            transform: scale(1.02);
+        }
+
+        .access-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.3em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            font-family: 'Georgia', serif;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        .access-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #764ba2, #667eea);
+        }
+
+        .access-button:active {
+            transform: translateY(-2px);
+        }
+
+        .access-button.secondary {
+            background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+        }
+
+        .access-button.secondary:hover {
+            background: linear-gradient(45deg, #7f8c8d, #95a5a6);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 1.1em;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: gradientShift 12s ease infinite;
+        }
+
+        .welcome-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 80px 50px;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            animation: pulseWelcome 2.5s ease-in-out infinite alternate;
+        }
+
+        .welcome-container p {
+            margin-bottom: 40px;
+        }
+
+        .read-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.3em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            font-family: 'Georgia', serif;
+            font-weight: bold;
+        }
+
+        .read-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #764ba2, #667eea);
+        }
+
+        .read-button:active {
+            transform: translateY(-2px);
+        }
+
+        .fade-out {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 1.2s ease-in-out;
+        }
+
+        .container.fade-in {
+            animation: slideInFromTop 1.8s ease-out;
+        }
+
+        @keyframes slideInFromTop {
+            from {
+                opacity: 0;
+                transform: translateY(-60px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .postdata {
+            text-align: right;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 2px solid rgba(102, 126, 234, 0.3);
+            color: #667eea;
+            font-size: 1.2em;
+            font-style: italic;
+            font-weight: bold;
+        }
+
+        .music-section {
+            text-align: center;
+            margin: 50px 0;
+            padding: 40px 30px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .music-intro {
+            color: #667eea;
+            font-size: 1.3em;
+            font-style: italic;
+            margin-bottom: 30px;
+            animation: musicPulse 2.5s ease-in-out infinite alternate;
+            font-weight: bold;
+        }
+
+        @keyframes musicPulse {
+            from { color: #667eea; text-shadow: 0 0 10px rgba(102, 126, 234, 0.3); }
+            to { color: #764ba2; text-shadow: 0 0 15px rgba(118, 75, 162, 0.4); }
+        }
+
+        .video-links {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .video-link {
+            display: inline-block;
+            margin: 10px 15px;
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .video-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #764ba2, #667eea);
+        }
+
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .heart {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 25px;
+            animation: float 18s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .counter {
+            text-align: center;
+            margin-top: 20px;
+            color: #667eea;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .hint {
+            font-size: 1.1em;
+            color: #e74c3c;
+            font-weight: bold;
+            background-color: rgba(231, 76, 60, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        .attempts-counter {
+            text-align: center;
+            margin-top: 10px;
+            color: #e74c3c;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .notification {
+            text-align: center;
+            margin-top: 20px;
+            color: #2c3e50;
+            font-size: 1.1em;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 15px;
+                padding: 35px 25px;
+            }
+            
+            h1 {
+                font-size: 2.2em;
+            }
+            
+            .message {
+                font-size: 1.05em;
+                text-indent: 25px;
+                padding: 25px;
+            }
+
+            .access-container, .welcome-container {
+                padding: 60px 35px;
+                margin: 20px;
+            }
+
+            .access-container h1, .welcome-container h1 {
+                font-size: 3em;
+            }
+
+            .access-container h2, .welcome-container h2 {
+                font-size: 1.8em;
+            }
+
+            .video-link {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-hearts">
+        <div class="heart" style="left: 5%; animation-delay: 0s;">♥</div>
+        <div class="heart" style="left: 15%; animation-delay: 2s;">♥</div>
+        <div class="heart" style="left: 25%; animation-delay: 4s;">♥</div>
+        <div class="heart" style="left: 35%; animation-delay: 6s;">♥</div>
+        <div class="heart" style="left: 45%; animation-delay: 8s;">♥</div>
+        <div class="heart" style="left: 55%; animation-delay: 10s;">♥</div>
+        <div class="heart" style="left: 65%; animation-delay: 12s;">♥</div>
+        <div class="heart" style="left: 75%; animation-delay: 14s;">♥</div>
+        <div class="heart" style="left: 85%; animation-delay: 16s;">♥</div>
+        <div class="heart" style="left: 95%; animation-delay: 18s;">♥</div>
+    </div>
+
+    <!-- Pantalla de clave de acceso -->
+    <div class="access-screen" id="accessScreen">
+        <div class="access-container">
+            <h1>🔐</h1>
+            <h2>Acceso Especial</h2>
+            <p>Ingresa la clave para leer tu mensaje</p>
+            <input type="password" id="accessCode" class="access-input" placeholder="Ingresa la clave secreta" maxlength="20">
+            <br>
+            <button class="access-button" onclick="checkAccess()">Ingresar</button>
+            <button class="access-button secondary" id="skipButton" onclick="skipAccess()" style="display: none;">Saltar (Solo esta vez)</button>
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            <div class="attempts-counter" id="attemptsCounter">Intentos fallidos: 0</div>
+            <div class="hint">💡 Pista: <strong>Como antes te decía de cariño...</strong></div>
+        </div>
+    </div>
+
+    <!-- Pantalla de bienvenida -->
+    <div class="welcome-screen" id="welcomeScreen" style="display: none;">
+        <div class="welcome-container">
+            <h1>💌</h1>
+            <h2>Tienes un mensaje especial</h2>
+            <p>Alguien importante quiere compartir algo contigo</p>
+            <button class="read-button" onclick="showMessage()">Leer Mensaje</button>
+        </div>
+    </div>
+
+    <!-- Mensaje principal (oculto inicialmente) -->
+    <div class="container" id="mainMessage" style="display: none;">
+        <div class="header">
+            <h1>Para Ti</h1>
+            <p class="subtitle">Con todo mi corazón</p>
+        </div>
+
+        <div class="message">
+            <div class="message-paragraph">
+                Por el transcurso de mi vida me llegué a topar con una persona que resultó ser demasiado importante para mí. Siempre me aferraba a la idea de que siempre estarías para mí, pero habían cosas que nos molestaban a los dos, no te voy a mentir, veía una vida contigo, tal vez. Me apresuré al pensar que así sería, pero créeme que ese siempre fue mi plan, siempre quise que fueras tú mi último amor, muchas veces quizás ambos hicimos cosas que nos hacían pensar intencionalmente que no nos queríamos y otras sin darnos cuenta, fue muy lindo encajar muy bien contigo, desde el principio hubo una buena conexión muy linda que al menos yo no creo encontrar en otra persona...
+            </div>
+            
+            <div class="message-paragraph">
+                Al principio me costó dejarte ir, y me está costando ya que contigo hice, expresé, di, mostré lo que es mi corazón y desde lo más profundo de mi ser, siempre te amé y a pesar de lo sucedido mi amor por ti persistirá eternamente, nunca quise que nuestro vínculo llegara a su fin, mucho menos de esta manera, agradezco que hayas permanecido a mi lado más de lo necesario, te pido disculpas por los errores que cometí y también te pido perdón por alejarme de tu vida., y me duele, tanto el corazón, las lágrimas corren mis ojos porque no fue fácil decirle adiós a la persona que quería en mi vida para el resto de mis días...
+            </div>
+            
+            <div class="message-paragraph">
+                Me encantaría que no te olvides de mí, porque yo jamás lo hice, quisiera regresar al día donde me dijiste lo mucho que me querías y lo mucho que me amabas. Estar a mi lado, pero esos recuerdos son los que me motivan a escribir esto, no sabes lo difícil que ha sido sanar, soltar, dejar atrás a la persona que pensé que nunca pensé que se iba a ir de mi lado y que tampoco te fueras de mi vida. Le doy gracias a Dios por permitirme conocerte, pero es momento de darte tu espacio, tu momento y dejarte ir, de permitirme que seas feliz, y que puedas sanar, si estás bien, yo lo estaré el doble, no sabemos qué nos tenga preparado el destino, y por el momento sé que me va seguir doliendo hasta el alma pero espero verte más adelante si Dios lo permite...
+            </div>
+            
+            <div class="message-paragraph">
+                Te comenté que primero prefiero conocer a alguien porque ya han roto la confianza y cuando te dije para estar era porque estaba seguro que eras la persona ideal y así lo creí, pero tal vez hice mal no demostrarte de todas las formas que me importas y que te quiero como no tienes idea, y cuando me pediste tiempo ya veía venir lo que ha pasado, nadie pide tiempo de la nada las cuales así como "dices que te dolió verme con María Laura", las cuales solo era cosa de trabajo y tú sabes bien que no te lastimaría y tampoco estaría con alguien más de clínica que no seas tú, y si soy enojón y orgulloso por eso aproveché todos los viajes posibles hacer para olvidarme de ti y de orgullo ni te escribía pero tu tampoco lo hiciste porque sé eres orgullosa, pero así dos personas que se aman se alejan, o no sé si algún momento de verdad me amaste, algún día dirás este terco que me decía anda al doctor, al gym, a pasear ya no me molesta, bueno supongo que ya habrá alguien como me lo dijiste, este terco molesto ya no estará cerca.
+            </div>
+            
+            <div class="message-paragraph">
+                No te tengo bloqueada de llamadas por si algún día dejas el orgullo y te sientes mal me puedas llamar, solo quise dejar de molestarte, como dije eras exclusiva para mí, te bloqueé no por inmadurez lo hice porque estoy seguro de lo que quiero y no quiero sufrir más viviendo del recuerdo o de una esperanza que me digas que tomaste una decisión por el enojo.... pero creo que eso nunca pasará, te acuerdas cuando me decías que estabas agradecida conmigo y las chicas porque estabas mal pues tú también estabas sanando esa desconfianza, cuando le decías a tus amigos que te habías sacado la tinka, me dolió cuando a veces me decías que nunca ibas a encontrar el amor y yo estaba ahí contigo, y cuando me dijiste si pasa algo hay que hablarlo y cuando me decías que algo te molestaba yo trataba de mejorar, te extraño niña, yo solo quería que seas sincera y directa y yo feliz así como yo lo era, pero créeme que estaré más cerca de ti o lo que pueda saber cómo estás y mientras tú estés bien y feliz yo lo seré... gracias por todo mi cachetona, enojona, dormilona, celosa, MI ROUS.....
+            </div>
+        </div>
+
+        <div class="hearts">
+            ♥ ♥ ♥
+        </div>
+
+        <div class="music-section">
+            <p class="music-intro">🎵 Esta canción siempre me hará recordar lo que vivimos juntos 🎵</p>
+            <div class="video-links">
+                <p style="color: #2c3e50; margin-bottom: 20px; font-weight: bold;">Puedes ver el video en:</p>
+                <a href="https://www.youtube.com/watch?v=7XPmRUp_Yf4" target="_blank" class="video-link">
+                    📺 Ver en YouTube
+                </a>
+                <a href="https://drive.google.com/file/d/1ygPIDyE10kvfAM8rDgYyKOk8FXJz-UZF/view?usp=sharing" target="_blank" class="video-link">
+                    🎬 Ver en Google Drive
+                </a>
+            </div>
+        </div>
+
+        <div class="counter" id="accessCounter">
+            Veces accedido: 6
+        </div>
+
+        <div class="signature">
+            <p>Siempre en mi corazón</p>
+        </div>
+
+        <div class="footer">
+            <p>Con amor eterno</p>
+            <button class="access-button" onclick="openWhatsApp()">Responder por WhatsApp</button>
+        </div>
+
+        <div class="postdata">
+            <p><strong>P.D.: Jor. Fi..</strong></p>
+        </div>
+
+        <div class="notification" id="notification">
+            💌 Mensaje leído el 12/6/2025, 7:48:14 p. m. después de 0 intentos fallidos.
+        </div>
+    </div>
+
+    <script>
+        // Configuración
+        const ACCESS_CODE = "CACHETONA";
+        let startTime = null;
+        let attemptCount = parseInt(localStorage.getItem('attemptCount') || '0'); // Contador de intentos fallidos
+
+        // Función para verificar el código de acceso
+        function checkAccess() {
+            const inputCode = document.getElementById('accessCode').value.trim().toUpperCase();
+            const errorDiv = document.getElementById('errorMessage');
+            const skipButton = document.getElementById('skipButton');
+            const attemptsCounter = document.getElementById('attemptsCounter');
+
+            if (inputCode === ACCESS_CODE) {
+                errorDiv.style.display = 'none';
+                attemptCount = 0; // Reiniciar intentos al éxito
+                localStorage.setItem('attemptCount', attemptCount);
+                showWelcomeScreen();
+            } else {
+                attemptCount++;
+                localStorage.setItem('attemptCount', attemptCount);
+                errorDiv.textContent = `❌ Código incorrecto. Intento ${attemptCount} de 50.`;
+                errorDiv.style.display = 'block';
+                attemptsCounter.textContent = `Intentos fallidos: ${attemptCount}`;
+
+                if (attemptCount >= 50) {
+                    skipButton.style.display = 'inline-block'; // Mostrar botón Saltar después de 50 intentos
+                }
+
+                setTimeout(() => {
+                    document.getElementById('accessCode').value = '';
+                    document.getElementById('accessCode').focus();
+                }, 1500);
+            }
+        }
+
+        // Función para saltar el acceso
+        function skipAccess() {
+            const skipButton = document.getElementById('skipButton');
+            showWelcomeScreen();
+            skipButton.style.display = 'none'; // Ocultar botón después de usarlo
+            attemptCount = 0; // Reiniciar intentos al saltar
+            localStorage.setItem('attemptCount', attemptCount);
+        }
+
+        // Función para mostrar la pantalla de bienvenida
+        function showWelcomeScreen() {
+            const accessScreen = document.getElementById('accessScreen');
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            
+            accessScreen.classList.add('fade-out');
+            
+            setTimeout(() => {
+                accessScreen.style.display = 'none';
+                welcomeScreen.style.display = 'flex';
+            }, 1200);
+        }
+
+        // Función para mostrar el mensaje principal y notificar
+        function showMessage() {
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const mainMessage = document.getElementById('mainMessage');
+            const notification = document.getElementById('notification');
+            
+            welcomeScreen.classList.add('fade-out');
+            
+            setTimeout(() => {
+                welcomeScreen.style.display = 'none';
+                mainMessage.style.display = 'block';
+                mainMessage.classList.add('fade-in');
+                
+                startTime = new Date();
+                notification.style.display = 'block';
+                console.log(`Mensaje leído el ${new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' })} después de ${attemptCount} intentos fallidos.`);
+            }, 1200);
+        }
+
+        // Función para abrir WhatsApp
+        function openWhatsApp() {
+            const phoneNumber = "+51920025691";
+            const message = "Hola, leí tu mensaje y quiero responderte...";
+            const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappURL, '_blank');
+        }
+
+        // Permitir usar Enter para enviar el código
+        document.addEventListener('DOMContentLoaded', function() {
+            const accessInput = document.getElementById('accessCode');
+            const attemptsCounter = document.getElementById('attemptsCounter');
+            if (accessInput && attemptsCounter) {
+                accessInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        checkAccess();
+                    }
+                });
+                attemptsCounter.textContent = `Intentos fallidos: ${attemptCount}`; // Mostrar intentos iniciales
+                accessInput.focus();
+            }
+        });
+
+        // Prevenir el clic derecho (opcional)
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Mensaje de despedida cuando se cierra la ventana
+        window.addEventListener('beforeunload', function(e) {
+            if (startTime) {
+                e.preventDefault();
+                e.returnValue = '¿Estás seguro de que quieres salir?';
+            }
+        });
+    </script>
+</body>
+</html>
