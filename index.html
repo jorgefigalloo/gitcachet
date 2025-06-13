@@ -1,11 +1,11 @@
 <script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+        return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
         if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
             try {
                 var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
@@ -19,11 +19,11 @@
 
                 // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
                 var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
                 );
                 // Fallback
                 if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
+                    headerRowIndex = 0;
                 }
 
                 // Convert filtered JSON back to CSV
@@ -36,12 +36,13 @@
             }
         }
         return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+    }
+</script>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Un Mensaje del Corazón</title>
     <style>
         * {
@@ -55,7 +56,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: flex-start; /* Cambiado de center a flex-start para evitar recorte superior */
             justify-content: center;
             padding: 20px;
             animation: gradientShift 12s ease infinite;
@@ -77,7 +78,9 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             animation: fadeIn 2s ease-in;
             position: relative;
-            overflow: hidden;
+            overflow: auto;
+            min-height: 80vh; /* Aumentado para mayor espacio */
+            width: 100%; /* Asegurar que ocupe el ancho disponible */
         }
 
         .container::before {
@@ -99,14 +102,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .header {
             text-align: center;
             margin-bottom: 40px;
             position: relative;
+            padding-top: 20px; /* Espacio adicional para el título */
         }
 
         .header::after {
@@ -153,15 +157,40 @@
             box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
         }
 
-        .message::before {
-            content: '"';
-            font-size: 5em;
-            color: #667eea;
-            opacity: 0.2;
-            position: absolute;
-            top: -15px;
-            left: 15px;
-            font-family: 'Times New Roman', serif;
+        .message-section {
+            display: none;
+        }
+
+        .message-section.active {
+            display: block;
+        }
+
+        .navigation {
+            text-align: center;
+            margin: 20px 0;
+            position: sticky;
+            top: 10px; /* Fija los botones cerca del inicio */
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            z-index: 1;
+        }
+
+        .nav-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(45deg, #764ba2, #667eea);
         }
 
         .message-paragraph {
@@ -206,8 +235,7 @@
             transition: all 0.4s ease;
         }
 
-        /* Pantalla de clave de acceso */
-        .access-screen {
+        .access-screen, .welcome-screen {
             position: fixed;
             top: 0;
             left: 0;
@@ -221,7 +249,7 @@
             animation: gradientShift 12s ease infinite;
         }
 
-        .access-container {
+        .access-container, .welcome-container {
             text-align: center;
             background: rgba(255, 255, 255, 0.95);
             padding: 80px 50px;
@@ -236,7 +264,7 @@
             to { transform: scale(1.03); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4); }
         }
 
-        .access-container h1 {
+        .access-container h1, .welcome-container h1 {
             font-size: 4em;
             margin-bottom: 25px;
             animation: bounce 2s ease-in-out infinite;
@@ -248,14 +276,14 @@
             60% { transform: translateY(-8px); }
         }
 
-        .access-container h2 {
+        .access-container h2, .welcome-container h2 {
             color: #2c3e50;
             font-size: 2.3em;
             margin-bottom: 20px;
             font-family: 'Georgia', serif;
         }
 
-        .access-container p {
+        .access-container p, .welcome-container p {
             color: #7f8c8d;
             font-size: 1.3em;
             margin-bottom: 40px;
@@ -284,7 +312,7 @@
             transform: scale(1.02);
         }
 
-        .access-button {
+        .access-button, .read-button {
             background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
             border: none;
@@ -299,13 +327,13 @@
             margin: 0 10px;
         }
 
-        .access-button:hover {
+        .access-button:hover, .read-button:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
             background: linear-gradient(45deg, #764ba2, #667eea);
         }
 
-        .access-button:active {
+        .access-button:active, .read-button:active {
             transform: translateY(-2px);
         }
 
@@ -324,58 +352,6 @@
             font-weight: bold;
         }
 
-        .welcome-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            animation: gradientShift 12s ease infinite;
-        }
-
-        .welcome-container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 80px 50px;
-            border-radius: 25px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(15px);
-            animation: pulseWelcome 2.5s ease-in-out infinite alternate;
-        }
-
-        .welcome-container p {
-            margin-bottom: 40px;
-        }
-
-        .read-button {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 18px 40px;
-            font-size: 1.3em;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            font-family: 'Georgia', serif;
-            font-weight: bold;
-        }
-
-        .read-button:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(45deg, #764ba2, #667eea);
-        }
-
-        .read-button:active {
-            transform: translateY(-2px);
-        }
-
         .fade-out {
             opacity: 0;
             transform: scale(0.9);
@@ -387,14 +363,8 @@
         }
 
         @keyframes slideInFromTop {
-            from {
-                opacity: 0;
-                transform: translateY(-60px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .postdata {
@@ -477,20 +447,10 @@
         }
 
         @keyframes float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) rotate(360deg);
-                opacity: 0;
-            }
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
         }
 
         .counter {
@@ -536,6 +496,7 @@
             .container {
                 margin: 15px;
                 padding: 35px 25px;
+                min-height: 85vh;
             }
             
             h1 {
@@ -564,6 +525,10 @@
             .video-link {
                 display: block;
                 margin: 10px 0;
+            }
+
+            .navigation {
+                top: 5px; /* Ajuste para pantallas pequeñas */
             }
         }
     </style>
@@ -616,24 +581,36 @@
         </div>
 
         <div class="message">
-            <div class="message-paragraph">
-                Por el transcurso de mi vida me llegué a topar con una persona que resultó ser demasiado importante para mí. Siempre me aferraba a la idea de que siempre estarías para mí, pero habían cosas que nos molestaban a los dos, no te voy a mentir, veía una vida contigo, tal vez. Me apresuré al pensar que así sería, pero créeme que ese siempre fue mi plan, siempre quise que fueras tú mi último amor, muchas veces quizás ambos hicimos cosas que nos hacían pensar intencionalmente que no nos queríamos y otras sin darnos cuenta, fue muy lindo encajar muy bien contigo, desde el principio hubo una buena conexión muy linda que al menos yo no creo encontrar en otra persona...
+            <div class="navigation">
+                <button class="nav-button" onclick="showSection(1)">Parte 1</button>
+                <button class="nav-button" onclick="showSection(2)">Parte 2</button>
+                <button class="nav-button" onclick="showSection(3)">Parte 3</button>
             </div>
-            
-            <div class="message-paragraph">
-                Al principio me costó dejarte ir, y me está costando ya que contigo hice, expresé, di, mostré lo que es mi corazón y desde lo más profundo de mi ser, siempre te amé y a pesar de lo sucedido mi amor por ti persistirá eternamente, nunca quise que nuestro vínculo llegara a su fin, mucho menos de esta manera, agradezco que hayas permanecido a mi lado más de lo necesario, te pido disculpas por los errores que cometí y también te pido perdón por alejarme de tu vida., y me duele, tanto el corazón, las lágrimas corren mis ojos porque no fue fácil decirle adiós a la persona que quería en mi vida para el resto de mis días...
+
+            <div class="message-section active" id="section1">
+                <div class="message-paragraph">
+                    Por el transcurso de mi vida me llegué a topar con una persona que resultó ser demasiado importante para mí. Siempre me aferraba a la idea de que siempre estarías para mí, pero habían cosas que nos molestaban a los dos, no te voy a mentir, veía una vida contigo, tal vez. Me apresuré al pensar que así sería, pero créeme que ese siempre fue mi plan, siempre quise que fueras tú mi último amor, muchas veces quizás ambos hicimos cosas que nos hacían pensar intencionalmente que no nos queríamos y otras sin darnos cuenta, fue muy lindo encajar muy bien contigo, desde el principio hubo una buena conexión muy linda que al menos yo no creo encontrar en otra persona...
+                </div>
+                
+                <div class="message-paragraph">
+                    Al principio me costó dejarte ir, y me está costando ya que contigo hice, expresé, di, mostré lo que es mi corazón y desde lo más profundo de mi ser, siempre te amé y a pesar de lo sucedido mi amor por ti persistirá eternamente, nunca quise que nuestro vínculo llegara a su fin, mucho menos de esta manera, agradezco que hayas permanecido a mi lado más de lo necesario, te pido disculpas por los errores que cometí y también te pido perdón por alejarme de tu vida., y me duele, tanto el corazón, las lágrimas corren mis ojos porque no fue fácil decirle adiós a la persona que quería en mi vida para el resto de mis días...
+                </div>
             </div>
-            
-            <div class="message-paragraph">
-                Me encantaría que no te olvides de mí, porque yo jamás lo hice, quisiera regresar al día donde me dijiste lo mucho que me querías y lo mucho que me amabas. Estar a mi lado, pero esos recuerdos son los que me motivan a escribir esto, no sabes lo difícil que ha sido sanar, soltar, dejar atrás a la persona que pensé que nunca pensé que se iba a ir de mi lado y que tampoco te fueras de mi vida. Le doy gracias a Dios por permitirme conocerte, pero es momento de darte tu espacio, tu momento y dejarte ir, de permitirme que seas feliz, y que puedas sanar, si estás bien, yo lo estaré el doble, no sabemos qué nos tenga preparado el destino, y por el momento sé que me va seguir doliendo hasta el alma pero espero verte más adelante si Dios lo permite...
+
+            <div class="message-section" id="section2">
+                <div class="message-paragraph">
+                    Me encantaría que no te olvides de mí, porque yo jamás lo hice, quisiera regresar al día donde me dijiste lo mucho que me querías y lo mucho que me amabas. Estar a mi lado, pero esos recuerdos son los que me motivan a escribir esto, no sabes lo difícil que ha sido sanar, soltar, dejar atrás a la persona que pensé que nunca pensé que se iba a ir de mi lado y que tampoco te fueras de mi vida. Le doy gracias a Dios por permitirme conocerte, pero es momento de darte tu espacio, tu momento y dejarte ir, de permitirme que seas feliz, y que puedas sanar, si estás bien, yo lo estaré el doble, no sabemos qué nos tenga preparado el destino, y por el momento sé que me va seguir doliendo hasta el alma pero espero verte más adelante si Dios lo permite...
+                </div>
+                
+                <div class="message-paragraph">
+                    Te comenté que primero prefiero conocer a alguien porque ya han roto la confianza y cuando te dije para estar era porque estaba seguro que eras la persona ideal y así lo creí, pero tal vez hice mal no demostrarte de todas las formas que me importas y que te quiero como no tienes idea, y cuando me pediste tiempo ya veía venir lo que ha pasado, nadie pide tiempo de la nada las cuales así como "dices que te dolió verme con María Laura", las cuales solo era cosa de trabajo y tú sabes bien que no te lastimaría y tampoco estaría con alguien más de clínica que no seas tú, y si soy enojón y orgulloso por eso aproveché todos los viajes posibles hacer para olvidarme de ti y de orgullo ni te escribía pero tu tampoco lo hiciste porque sé eres orgullosa, pero así dos personas que se aman se alejan, o no sé si algún momento de verdad me amaste, algún día dirás este terco que me decía anda al doctor, al gym, a pasear para irnos a la sierra , cuando te decia que comas quion para tu gripe...  ya no me molesta, bueno supongo que ya habrá alguien como me lo dijiste, este terco molesto ya no estará cerca.
+                </div>
             </div>
-            
-            <div class="message-paragraph">
-                Te comenté que primero prefiero conocer a alguien porque ya han roto la confianza y cuando te dije para estar era porque estaba seguro que eras la persona ideal y así lo creí, pero tal vez hice mal no demostrarte de todas las formas que me importas y que te quiero como no tienes idea, y cuando me pediste tiempo ya veía venir lo que ha pasado, nadie pide tiempo de la nada las cuales así como "dices que te dolió verme con María Laura", las cuales solo era cosa de trabajo y tú sabes bien que no te lastimaría y tampoco estaría con alguien más de clínica que no seas tú, y si soy enojón y orgulloso por eso aproveché todos los viajes posibles hacer para olvidarme de ti y de orgullo ni te escribía pero tu tampoco lo hiciste porque sé eres orgullosa, pero así dos personas que se aman se alejan, o no sé si algún momento de verdad me amaste, algún día dirás este terco que me decía anda al doctor, al gym, a pasear ya no me molesta, bueno supongo que ya habrá alguien como me lo dijiste, este terco molesto ya no estará cerca.
-            </div>
-            
-            <div class="message-paragraph">
-                No te tengo bloqueada de llamadas por si algún día dejas el orgullo y te sientes mal me puedas llamar, solo quise dejar de molestarte, como dije eras exclusiva para mí, te bloqueé no por inmadurez lo hice porque estoy seguro de lo que quiero y no quiero sufrir más viviendo del recuerdo o de una esperanza que me digas que tomaste una decisión por el enojo.... pero creo que eso nunca pasará, te acuerdas cuando me decías que estabas agradecida conmigo y las chicas porque estabas mal pues tú también estabas sanando esa desconfianza, cuando le decías a tus amigos que te habías sacado la tinka, me dolió cuando a veces me decías que nunca ibas a encontrar el amor y yo estaba ahí contigo, y cuando me dijiste si pasa algo hay que hablarlo y cuando me decías que algo te molestaba yo trataba de mejorar, te extraño niña, yo solo quería que seas sincera y directa y yo feliz así como yo lo era, pero créeme que estaré más cerca de ti o lo que pueda saber cómo estás y mientras tú estés bien y feliz yo lo seré... gracias por todo mi cachetona, enojona, dormilona, celosa, MI ROUS.....
+
+            <div class="message-section" id="section3">
+                <div class="message-paragraph">
+                    No te tengo bloqueada de llamadas por si algún día te sientes mal me puedas llamar, solo quise dejar de molestarte, como dije eras exclusiva para mí, te bloqueé no por inmadurez lo hice porque estoy seguro de lo que quiero y no quiero sufrir más viviendo del recuerdo o de una esperanza que me digas que tomaste una decisión por el enojo... como digo o creo siento que lo hiciste al final por vengarte o bueno claramente nunca me quisiste y mientras sí me estaba enganchando. Aun no me pasa o algo no me permite olvidarte o dejar de pensarte y quererte, en ese caso entendí que no puedo luchar con lo que siento y solo aceptar que estás con alguien más y así me duele y créeme que me duele como no tienes idea, tendré que aceptarlo, mientras tú estés bien y seas feliz estaré bien. Pero creo que eso nunca pasará, te acuerdas cuando me decías que estabas agradecida conmigo y las chicas porque estabas mal pues tú también estabas sanando esa desconfianza, cuando le decías a tus amigos que te habías sacado la tinka, me dolió cuando a veces me decías que nunca ibas a encontrar el amor y yo estaba ahí contigo, y cuando me dijiste si pasa algo hay que hablarlo y cuando me decías que algo te molestaba yo trataba de mejorar, te extraño niña, yo solo quería que seas sincera y directa y yo feliz así como yo lo era, pero créeme que estaré más cerca de ti o lo que pueda saber cómo estás y mientras tú estés bien y feliz yo lo seré... gracias por todo mi cachetona, enojona, dormilona, celosa, MI ROUS.....
+                </div>
             </div>
         </div>
 
@@ -642,7 +619,7 @@
         </div>
 
         <div class="music-section">
-            <p class="music-intro">🎵 Esta canción siempre me hará recordar lo que vivimos juntos 🎵</p>
+            <p class="music-intro">🎵 Esta canción siempre me hará recordar a ti  🎵</p>
             <div class="video-links">
                 <p style="color: #2c3e50; margin-bottom: 20px; font-weight: bold;">Puedes ver el video en:</p>
                 <a href="https://www.youtube.com/watch?v=7XPmRUp_Yf4" target="_blank" class="video-link">
@@ -672,7 +649,7 @@
         </div>
 
         <div class="notification" id="notification">
-            💌 Mensaje leído el 12/6/2025, 7:48:14 p. m. después de 0 intentos fallidos.
+            💌 Mensaje leído el 13/6/2025, 10:49 a. m. después de 0 intentos fallidos.
         </div>
     </div>
 
@@ -727,7 +704,6 @@
             const welcomeScreen = document.getElementById('welcomeScreen');
             
             accessScreen.classList.add('fade-out');
-            
             setTimeout(() => {
                 accessScreen.style.display = 'none';
                 welcomeScreen.style.display = 'flex';
@@ -741,16 +717,22 @@
             const notification = document.getElementById('notification');
             
             welcomeScreen.classList.add('fade-out');
-            
             setTimeout(() => {
                 welcomeScreen.style.display = 'none';
                 mainMessage.style.display = 'block';
                 mainMessage.classList.add('fade-in');
-                
-                startTime = new Date();
+                window.scrollTo(0, 0); // Asegura que se vea desde el inicio
                 notification.style.display = 'block';
                 console.log(`Mensaje leído el ${new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' })} después de ${attemptCount} intentos fallidos.`);
             }, 1200);
+        }
+
+        // Función para navegar entre secciones
+        function showSection(sectionNumber) {
+            const sections = document.querySelectorAll('.message-section');
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById(`section${sectionNumber}`).classList.add('active');
+            window.scrollTo(0, 0); // Asegura que la página vuelva al inicio al cambiar de sección
         }
 
         // Función para abrir WhatsApp
